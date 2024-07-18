@@ -9,33 +9,51 @@ import Foundation
 
 class Service:  ObservableObject {
     
-    func fetchData(for title: String, completion: @escaping (Result<Movie, Error>) -> Void) {
+    func fetchData(titles: [String], completion: @escaping (Result<[Movie], Error>) -> Void) {
         let apiKey = "fbf719d2"
-        let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&t=\(title)"
+        let group = DispatchGroup()
+        var movies: [Movie] = []
+        var errors: [Error] = []
         
-        guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
-            completion(.failure(NSError(domain: "Invalid Url", code: -1, userInfo: nil)))
-            return
+        for title in titles {
+            group.enter()
+            let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&t=\(title)"
+            guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
+                completion(.failure(NSError(domain: "Invalid Url", code: -1, userInfo: nil)))
+                group.leave()
+                continue
+            }
+            
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    errors.append(error)
+                    group.leave()
+                    return
+                }
+                
+                guard let data = data else {
+                    completion(.failure(NSError(domain: "No Data", code: -1, userInfo: nil)))
+                    group.leave()
+                    return
+                }
+                
+                do {
+                    let movie = try JSONDecoder().decode(Movie.self, from: data)
+                    movies.append(movie)
+                } catch {
+                    errors.append(error)
+                }
+                group.leave()
+            }.resume()
+            
         }
         
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
+        group.notify(queue: .main) {
+            if errors.isEmpty {
+                completion(.success(movies))
+            } else {
+                completion(.failure(errors.first!))
             }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "No Data", code: -1, userInfo: nil)))
-                return
-            }
-            
-            do {
-                let movie = try JSONDecoder().decode(Movie.self, from: data)
-                completion(.success(movie))
-            } catch {
-                completion(.failure(error))
-            }
-        }.resume()
-        
+        }
     }
 }
