@@ -7,11 +7,11 @@
 
 import Foundation
 
-class Service {
+class Service:  ObservableObject {
     
     func fetchData(for title: String, completion: @escaping (Result<Movie, Error>) -> Void) {
         let apiKey = "fbf719d2"
-        let urlString = "http://www.omdbapi.com/?apikey=\(apiKey)&t=\(title)"
+        let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&t=\(title)"
         
         guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
             completion(.failure(NSError(domain: "Invalid Url", code: -1, userInfo: nil)))
