@@ -1,4 +1,4 @@
-# MovieApp
+# MovieApp MiniHackathon task 3
 
 Movie Finder App is an iOS application that allows users to search for movies and view detailed information about them. The app provides users with movie titles, release years, and posters, enabling them to explore movie details effectively.
 
@@ -22,4 +22,6 @@ Movie Finder App is an iOS application that allows users to search for movies an
 - **`MoviesView`**: The main view for searching and listing movies.
 - **`MovieDetailView`**: Shows detailed information about the selected movie.
 - **`MoviePosterView`**: Displays movie posters with asynchronous loading.
+
+ https://github.com/user-attachments/assets/50fe9042-a763-4a76-98fd-cbda660a2edf
 
