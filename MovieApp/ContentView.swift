@@ -28,9 +28,9 @@ struct ContentView: View {
                     ForEach(movies) { movie in
                         VStack {
                             AsyncImage(url: URL(string: movie.poster))
-                                    .frame(width: 150, height: 200)
-                                    .onTapGesture {
-                                        checkAnswer(movie: movie)
+                                .frame(width: 200, height: 250)
+                                        .onTapGesture {
+                                    checkAnswer(movie: movie)
                             }
                         }
                     }

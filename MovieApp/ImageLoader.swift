@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+
 class ImageLoader: ObservableObject {
     @Published var image: UIImage?
        private var url: URL?
@@ -34,4 +35,6 @@ class ImageLoader: ObservableObject {
 
 }
 
-
+struct SearchResponse: Decodable {
+    let search: [Movie]
+}

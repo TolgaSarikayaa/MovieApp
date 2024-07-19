@@ -7,21 +7,20 @@
 
 import Foundation
 
-struct Movie: Codable, Identifiable {
-    let id = UUID()
+struct Movie: Identifiable, Decodable {
+    var id: String { imdbID }
     let title: String
     let year: String
-    let rated: String
-    let released: String
-    let genre: String
     let poster: String
+    let imdbID: String
     
     enum CodingKeys: String, CodingKey {
         case title = "Title"
         case year = "Year"
-        case rated = "Rated"
-        case released = "Released"
-        case genre = "Genre"
         case poster = "Poster"
+        case imdbID = "imdbID"
     }
 }
+
+
+    
