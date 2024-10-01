@@ -11,7 +11,7 @@ class Service:  ObservableObject {
     @Published var movies: [Movie] = []
     
     func fetchData(titles: [String], completion: @escaping (Result<[Movie], Error>) -> Void) {
-        let apiKey = "fbf719d2"
+        let apiKey = ProcessInfo.processInfo.environment["API_KEY"] ?? "DefaultApiKey"
         let group = DispatchGroup()
         var movies: [Movie] = []
         var errors: [Error] = []
@@ -59,7 +59,7 @@ class Service:  ObservableObject {
     }
     
     func fetchFilm(for title: String, completion: @escaping (Result<Movie, Error>) -> Void) {
-        let apiKey = "fbf719d2"
+        let apiKey = ProcessInfo.processInfo.environment["API_KEY"] ?? "DefaultApiKey"
         let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&t=\(title)"
         
         guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
@@ -88,7 +88,7 @@ class Service:  ObservableObject {
     }
     
     func fetchMovies(by genre: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
-        let apiKey = "fbf719d2"
+        let apiKey = ProcessInfo.processInfo.environment["API_KEY"] ?? "DefaultApiKey"
         let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&s=\(genre)&type=movie"
 
         guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
