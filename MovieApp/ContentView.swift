@@ -9,34 +9,51 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var movies: [Movie] = []
-    @State private var currentMovieTitle: String = ""
+    @State private var currentMovie: Movie?
+    @State private var movieOptions: [String] = []
     @StateObject private var service = Service()
     @State private var errorMessage: String?
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var blurAmount: CGFloat = 10.0
+    @State private var imageLoaded = false
     
     var body: some View {
         VStack {
-            if !currentMovieTitle.isEmpty {
-                Text("Welcher Film ist das: \(currentMovieTitle)?")
-                    .font(.headline)
-                    .padding()
-            }
-            
-            if movies.count == 2 {
-                HStack {
-                    ForEach(movies) { movie in
-                        VStack {
-                            AsyncImage(url: URL(string: movie.poster))
-                                .frame(width: 200, height: 250)
-                                        .onTapGesture {
-                                    checkAnswer(movie: movie)
+            if let currentMovie = currentMovie {
+                VStack {
+                    AsyncImage(url: URL(string: currentMovie.poster))
+                        .frame(width: 400, height: 350)
+                        .cornerRadius(8)
+                        .shadow(radius: 10)
+                        .blur(radius: blurAmount)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 4)) {
+                                blurAmount = 0.0
+                            }
+                            
+                        }
+                    
+                    Text("Welcher Film ist das?")
+                        .font(.headline)
+                        .padding()
+                    VStack {
+                        ForEach(movieOptions, id: \.self) { option in
+                            Button {
+                                checkAnswer(selectedTitle: option)
+                            } label: {
+                                Text(option)
+                                    .padding()
+                                    .background(Color.blue)
+                                    .foregroundStyle(.white)
+                                    .cornerRadius(8)
+                                    .padding(.bottom, 30)
                             }
                         }
                     }
                 }
             } else {
-                Text("Loading...")
+                Text("Loading")
             }
             
         }
@@ -53,8 +70,9 @@ struct ContentView: View {
         }
     }
         
+    
         private func loadMovies() {
-            self.currentMovieTitle = ""
+            self.currentMovie = nil
             self.movies = []
             
             let allFilmTitles = [
@@ -70,7 +88,10 @@ struct ContentView: View {
                 case .success(let movies):
                     self.movies = movies
                     if let randomMovie = movies.randomElement() {
-                        self.currentMovieTitle = randomMovie.title
+                        self.currentMovie = randomMovie
+                        self.movieOptions = movies.map { $0.title }.shuffled()
+                        self.blurAmount = 10.0
+                        self.imageLoaded = false
                     }
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
@@ -78,11 +99,11 @@ struct ContentView: View {
             }
         }
         
-        private func checkAnswer(movie: Movie) {
-            if movie.title == currentMovieTitle {
+        private func checkAnswer(selectedTitle: String) {
+            if selectedTitle == currentMovie?.title {
                 alertMessage = "Richtig!"
             } else {
-                alertMessage = "Falsch! Korrekter Film: \(currentMovieTitle)"
+                alertMessage = "Falsch! Korrekter Film: \(currentMovie?.title ?? "")"
             }
             showAlert = true
         }

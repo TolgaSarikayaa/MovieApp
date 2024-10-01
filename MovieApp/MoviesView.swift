@@ -37,7 +37,7 @@ struct MoviesView: View {
                     .listStyle(PlainListStyle())
                 }
             }
-            .navigationTitle("Search Film")
+            .navigationTitle("Search Movie")
             .searchable(text: $searchMovie)
             .onChange(of: searchMovie) { newValue , oldValue in
                 if !newValue.isEmpty {

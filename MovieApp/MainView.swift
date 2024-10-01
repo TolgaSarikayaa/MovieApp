@@ -13,7 +13,7 @@ struct MainView: View {
         TabView {
             ContentView()
                 .tabItem {
-                    Label("Quiz", systemImage: "gamecontroller.fill")
+                    Label("Quiz Game", systemImage: "gamecontroller.fill")
                 }
             MoviesView()
                 .tabItem {
