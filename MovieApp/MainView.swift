@@ -15,10 +15,10 @@ struct MainView: View {
                 .tabItem {
                     Label("Quiz Game", systemImage: "gamecontroller.fill")
                 }
-            MoviesView()
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass.circle.fill")
-                }
+//            MoviesView()
+//                .tabItem {
+//                    Label("Search", systemImage: "magnifyingglass.circle.fill")
+//                }
         }
     }
 }

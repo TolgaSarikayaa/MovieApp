@@ -10,37 +10,43 @@ import SwiftUI
 
 struct AsyncImage: View {
     @StateObject private var loader: ImageLoader
-    private let placeholder: Image
+    @State private var blurAmount: CGFloat = 10.0
     
     
-    init(url: URL?, placeholder: Image = Image(systemName: "photo")) {
-           _loader = StateObject(wrappedValue: ImageLoader(url: url))
-           self.placeholder = placeholder
-       }
+    init(url: URL?) {
+        _loader = StateObject(wrappedValue: ImageLoader(url: url))
+    }
     
     var body: some View {
         image
             .cornerRadius(10)
+            .blur(radius: blurAmount)
             .onAppear {
                 loader.load()
-              
+                Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { timer in
+                    if blurAmount > 0 {
+                        blurAmount -= 0.7
+                    } else {
+                        timer.invalidate()
+                    }
+                }
             }
-
-        }
         
+    }
+    
     
     private var image: some View {
-            Group {
-                if let image = loader.image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                } else {
-                    placeholder
-                        .resizable()
-                        .scaledToFit()
-                }
+        Group {
+            if let image = loader.image {
+                AnyView(Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit())
+            } else {
+                AnyView(ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .frame(width: 50, height: 50)) 
             }
         }
     }
+}
     

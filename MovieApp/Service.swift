@@ -86,4 +86,39 @@ class Service:  ObservableObject {
             }
         }.resume()
     }
+    
+    func fetchMovies(by genre: String, completion: @escaping (Result<[Movie], Error>) -> Void) {
+        let apiKey = "fbf719d2"
+        let urlString = "https://www.omdbapi.com/?apikey=\(apiKey)&s=\(genre)&type=movie"
+
+        guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No Data", code: -1, userInfo: nil)))
+                return
+            }
+
+            do {
+                let movieList = try JSONDecoder().decode(MovieListResponse.self, from: data)
+                completion(.success(movieList.Search)) // Burada tüm filmleri döndürüyoruz.
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
+    struct MovieListResponse: Decodable {
+        let Search: [Movie]
+    }
 }
+
+

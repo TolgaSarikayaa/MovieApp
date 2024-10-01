@@ -15,39 +15,44 @@ struct ContentView: View {
     @State private var errorMessage: String?
     @State private var showAlert = false
     @State private var alertMessage = ""
-    @State private var blurAmount: CGFloat = 10.0
+    @State private var selectedGenre: String = "action"
+    let genres = ["action", "drama", "comedy", "thriller"]
+//    @State private var blurAmount: CGFloat = 10.0
     
     var body: some View {
         VStack {
+            Picker("Select Genre", selection: $selectedGenre) {
+                ForEach(genres, id: \.self) { genre in
+                    Text(genre.capitalized).tag(genre)
+                    
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding()
+            
             if let currentMovie = currentMovie {
                 VStack {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.1),radius: 10, x: 0, y: 5)
-                            .frame(width: 280,height: 380)
-                            .padding()
-                        
+                    Text("Welcher Film ist das?")
+                        .font(.headline)
+                        .padding()
+                 
                     AsyncImage(url: URL(string: currentMovie.poster))
                         .frame(width: 400, height: 350)
                         .clipped()
                         .cornerRadius(8)
                         .shadow(radius: 10)
-                        .blur(radius: blurAmount)
-                        .onAppear {
-                            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { timer in
-                                if blurAmount > 0 {
-                                    blurAmount -= 0.7
-                                } else {
-                                    timer.invalidate()
-                            }
-                        }
-                    }
-                }
-                    
-                    Text("Welcher Film ist das?")
-                        .font(.headline)
+//                        .blur(radius: blurAmount)
+//                        .onAppear {
+//                            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { timer in
+//                                if blurAmount > 0 {
+//                                    blurAmount -= 0.7
+//                                } else {
+//                                    timer.invalidate()
+//                            }
+//                        }
+//                    }
                         .padding()
+    
                     VStack {
                         ForEach(movieOptions, id: \.self) { option in
                             Button {
@@ -79,34 +84,34 @@ struct ContentView: View {
                 }
             }))
         }
+        .onChange(of: selectedGenre) { oldValue, newValue in
+            loadMovies()
+        }
     }
     
-        private func loadMovies() {
+    private func loadMovies() {
             self.currentMovie = nil
             self.movies = []
-            
-            let allFilmTitles = [
-                        "Blade Runner", "Inception", "The Matrix", "The Godfather", "Pulp Fiction",
-                        "The Dark Knight", "Fight Club", "Forrest Gump", "The Shawshank Redemption",
-                        "Interstellar", "Gladiator", "The Silence of the Lambs", "Se7en", "The Prestige",
-                        "Memento", "Titanic", "The Departed", "Goodfellas", "Braveheart", "Jaws"
-                    ]
-            let selectedTitles = Array(allFilmTitles.shuffled().prefix(2))
-           
-            service.fetchData(titles: selectedTitles) { result in
+
+            // Servis çağrısı yaparak belirlenen kategoriye göre filmleri çekiyoruz.
+            service.fetchMovies(by: selectedGenre) { result in
                 switch result {
                 case .success(let movies):
                     self.movies = movies
+                    
                     if let randomMovie = movies.randomElement() {
                         self.currentMovie = randomMovie
-                        self.movieOptions = movies.map { $0.title }.shuffled()
-                    
+
+                        // Rastgele iki film seçiyoruz, biri doğru seçenek, diğeri yanlış.
+                        let otherMovies = movies.filter { $0.title != randomMovie.title }.shuffled().prefix(1)
+                        self.movieOptions = [randomMovie.title] + otherMovies.map { $0.title }.shuffled()
                     }
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
                 }
             }
         }
+
         
         private func checkAnswer(selectedTitle: String) {
             if selectedTitle == currentMovie?.title {
