@@ -109,7 +109,7 @@ class Service:  ObservableObject {
 
             do {
                 let movieList = try JSONDecoder().decode(MovieListResponse.self, from: data)
-                completion(.success(movieList.Search)) // Burada tüm filmleri döndürüyoruz.
+                completion(.success(movieList.Search)) // Here we rotate all the movies.
             } catch {
                 completion(.failure(error))
             }

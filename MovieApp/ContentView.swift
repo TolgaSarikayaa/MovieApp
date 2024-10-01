@@ -15,12 +15,16 @@ struct ContentView: View {
     @State private var errorMessage: String?
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var score: Int = 0
     @State private var selectedGenre: String = "action"
     let genres = ["action", "drama", "comedy", "thriller"]
-//    @State private var blurAmount: CGFloat = 10.0
     
     var body: some View {
         VStack {
+            Text("Score: \(score)")
+                .font(.title2)
+                .padding()
+            
             Picker("Select Genre", selection: $selectedGenre) {
                 ForEach(genres, id: \.self) { genre in
                     Text(genre.capitalized).tag(genre)
@@ -41,16 +45,6 @@ struct ContentView: View {
                         .clipped()
                         .cornerRadius(8)
                         .shadow(radius: 10)
-//                        .blur(radius: blurAmount)
-//                        .onAppear {
-//                            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { timer in
-//                                if blurAmount > 0 {
-//                                    blurAmount -= 0.7
-//                                } else {
-//                                    timer.invalidate()
-//                            }
-//                        }
-//                    }
                         .padding()
     
                     VStack {
@@ -81,6 +75,8 @@ struct ContentView: View {
             Alert(title: Text("Ergebniss"), message: Text(alertMessage), dismissButton: .default(Text("Okey"), action: {
                 if self.alertMessage == "Richtig!" {
                     self.loadMovies()
+                } else {
+                    self.loadMovies()
                 }
             }))
         }
@@ -93,7 +89,7 @@ struct ContentView: View {
             self.currentMovie = nil
             self.movies = []
 
-            // Servis çağrısı yaparak belirlenen kategoriye göre filmleri çekiyoruz.
+            // We shoot films according to the category determined by making a service call.
             service.fetchMovies(by: selectedGenre) { result in
                 switch result {
                 case .success(let movies):
@@ -102,7 +98,7 @@ struct ContentView: View {
                     if let randomMovie = movies.randomElement() {
                         self.currentMovie = randomMovie
 
-                        // Rastgele iki film seçiyoruz, biri doğru seçenek, diğeri yanlış.
+                        // We randomly choose two movies, one is the correct option, the other is wrong.
                         let otherMovies = movies.filter { $0.title != randomMovie.title }.shuffled().prefix(1)
                         self.movieOptions = [randomMovie.title] + otherMovies.map { $0.title }.shuffled()
                     }
@@ -112,12 +108,16 @@ struct ContentView: View {
             }
         }
 
-        
         private func checkAnswer(selectedTitle: String) {
             if selectedTitle == currentMovie?.title {
                 alertMessage = "Richtig!"
+                    score += 1
             } else {
                 alertMessage = "Falsch! Korrekter Film: \(currentMovie?.title ?? "")"
+                if score > 0 {
+                    score -= 1
+                }
+               
             }
             showAlert = true
         }

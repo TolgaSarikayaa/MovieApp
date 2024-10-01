@@ -45,6 +45,8 @@ struct AsyncImage: View {
                 AnyView(ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
                     .frame(width: 50, height: 50)) 
+//      AnyView: AnyView is used to cover different types of views in a single type. In this way,
+//      you will eliminate Swift's uncertainty in determining types.
             }
         }
     }
