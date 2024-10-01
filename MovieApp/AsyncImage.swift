@@ -12,6 +12,7 @@ struct AsyncImage: View {
     @StateObject private var loader: ImageLoader
     private let placeholder: Image
     
+    
     init(url: URL?, placeholder: Image = Image(systemName: "photo")) {
            _loader = StateObject(wrappedValue: ImageLoader(url: url))
            self.placeholder = placeholder
@@ -19,8 +20,14 @@ struct AsyncImage: View {
     
     var body: some View {
         image
-        .onAppear(perform: loader.load)
+            .cornerRadius(10)
+            .onAppear {
+                loader.load()
+              
+            }
+
         }
+        
     
     private var image: some View {
             Group {

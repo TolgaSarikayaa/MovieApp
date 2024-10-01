@@ -16,23 +16,34 @@ struct ContentView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var blurAmount: CGFloat = 10.0
-    @State private var imageLoaded = false
     
     var body: some View {
         VStack {
             if let currentMovie = currentMovie {
                 VStack {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white)
+                            .shadow(color: Color.black.opacity(0.1),radius: 10, x: 0, y: 5)
+                            .frame(width: 280,height: 380)
+                            .padding()
+                        
                     AsyncImage(url: URL(string: currentMovie.poster))
                         .frame(width: 400, height: 350)
+                        .clipped()
                         .cornerRadius(8)
                         .shadow(radius: 10)
                         .blur(radius: blurAmount)
                         .onAppear {
-                            withAnimation(.easeInOut(duration: 4)) {
-                                blurAmount = 0.0
+                            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { timer in
+                                if blurAmount > 0 {
+                                    blurAmount -= 0.7
+                                } else {
+                                    timer.invalidate()
                             }
-                            
                         }
+                    }
+                }
                     
                     Text("Welcher Film ist das?")
                         .font(.headline)
@@ -69,7 +80,6 @@ struct ContentView: View {
             }))
         }
     }
-        
     
         private func loadMovies() {
             self.currentMovie = nil
@@ -90,8 +100,7 @@ struct ContentView: View {
                     if let randomMovie = movies.randomElement() {
                         self.currentMovie = randomMovie
                         self.movieOptions = movies.map { $0.title }.shuffled()
-                        self.blurAmount = 10.0
-                        self.imageLoaded = false
+                    
                     }
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
