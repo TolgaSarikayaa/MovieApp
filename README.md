@@ -16,3 +16,5 @@ This app fetches movie data from the OMDb API and presents a blurred movie poste
 
 ## 📐 Project Architecture
 - The app follows the MVVM (Model-View-ViewModel) architecture. This structure keeps data and the UI separate, ensuring a maintainable codebase.
+
+![Simulator Screenshot - iPhone 16 Pro - 2024-11-01 at 21 21 58 1](https://github.com/user-attachments/assets/1e446f76-50a0-42e1-b3a6-62bd84a63163)
